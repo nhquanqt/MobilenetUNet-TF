@@ -45,12 +45,17 @@ if is_continue_training:
 
 print('Loading the data ...')
 
-train_input_names = []
-train_output_names = []
+# train_input_names = []
+# train_output_names = []
+train_inputs = []
+train_outputs = []
 with open('/content/data/train.txt') as f:
     for line in f:
-        train_input_names.append(line.split(' ')[0])
-        train_output_names.append(line.split(' ')[1])
+        # train_input_names.append(line.split(' ')[0])
+        # train_output_names.append(line.split(' ')[1])
+        train_inputs.append(cv2.imread(line.split(' ')[0]))
+        train_outputs.append(np.expand_dims(cv2.imread(line.split(' ')[1], cv2.IMREAD_GRAYSCALE), -1))
+
 
 # Start the training here
 for epoch in range(num_epochs):
@@ -59,7 +64,9 @@ for epoch in range(num_epochs):
 
     cnt=0
 
-    id_list = np.random.permutation(len(train_input_names))
+    # id_list = np.random.permutation(len(train_input_names))
+    id_list = np.random.permutation(len(train_inputs))
+    
 
     num_iters = int(np.floor(len(id_list) / batch_size))
     st = time.time()
@@ -72,9 +79,11 @@ for epoch in range(num_epochs):
         for j in range(batch_size):
             index = i*batch_size + j
             id = id_list[index]
-            input_image = cv2.imread(train_input_names[id]) / 255.
-            output_image = cv2.imread(train_output_names[id], cv2.IMREAD_GRAYSCALE) / 255.
-            output_image = np.expand_dims(output_image, -1)
+            input_image = train_inputs[id] / 255.
+            output_image = train_outputs[id] / 255.
+            # input_image = cv2.imread(train_input_names[id]) / 255.
+            # output_image = cv2.imread(train_output_names[id], cv2.IMREAD_GRAYSCALE) / 255.
+            # output_image = np.expand_dims(output_image, -1)
 
             input_image_batch.append(input_image)
             output_image_batch.append(output_image)
@@ -86,7 +95,7 @@ for epoch in range(num_epochs):
         _,current=sess.run([opt,loss],feed_dict={net_input:input_image_batch,net_output:output_image_batch})
         current_losses.append(current)
         cnt = cnt + batch_size
-        if cnt % 20 == 0:
+        if cnt % 128 == 0:
             string_print = "Epoch = %d Count = %d Current_Loss = %.4f Time = %.2f"%(epoch,cnt,current,time.time()-st)
             print(string_print)
             st = time.time()

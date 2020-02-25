@@ -27,14 +27,14 @@ def build_mobilenet_v2_unet(inputs, num_classes):
     logits, end_points = mobilenet_v2.mobilenet_base(inputs)
     with tf.variable_scope('UNet') as scope:
 
-        net = conv2d(logits, 320, 3)
+        net = conv2d_transpose(logits, 320, 3)
         
         net = tf.concat([
             tf.get_default_graph().get_tensor_by_name('MobilenetV2/expanded_conv_16/output:0'),
             net
         ], -1)
-        net = conv2d(net, 320, 3)
-        net = conv2d(net, 192, 3)
+        net = conv2d_transpose(net, 320, 3)
+        net = conv2d_transpose(net, 192, 3)
 
         net = conv2d_transpose(net, 192, 3, stride=2)
         net = tf.concat([
@@ -42,8 +42,8 @@ def build_mobilenet_v2_unet(inputs, num_classes):
             tf.get_default_graph().get_tensor_by_name('MobilenetV2/expanded_conv_11/output:0'),
             net
         ], -1)
-        net = conv2d(net, 192, 3)
-        net = conv2d(net, 64, 3)
+        net = conv2d_transpose(net, 192, 3)
+        net = conv2d_transpose(net, 64, 3)
 
         net = conv2d_transpose(net, 64, 3, stride=2)
         net = tf.concat([
@@ -51,27 +51,27 @@ def build_mobilenet_v2_unet(inputs, num_classes):
             tf.get_default_graph().get_tensor_by_name('MobilenetV2/expanded_conv_4/output:0'),
             net
         ], -1)
-        net = conv2d(net, 64, 3)
-        net = conv2d(net, 32, 3)
+        net = conv2d_transpose(net, 64, 3)
+        net = conv2d_transpose(net, 32, 3)
 
         net = conv2d_transpose(net, 24, 3, stride=2)
         net = tf.concat([
             tf.get_default_graph().get_tensor_by_name('MobilenetV2/expanded_conv_2/output:0'),
             net
         ], -1)
-        net = conv2d(net, 24, 3)
-        net = conv2d(net, 16, 3)
+        net = conv2d_transpose(net, 24, 3)
+        net = conv2d_transpose(net, 16, 3)
 
         net = conv2d_transpose(net, 16, 3, stride=2)
         net = tf.concat([
             tf.get_default_graph().get_tensor_by_name('MobilenetV2/expanded_conv/output:0'),
             net
         ], -1)
-        net = conv2d(net, 16, 3)
-        net = conv2d(net, 8, 3)
+        net = conv2d_transpose(net, 16, 3)
+        net = conv2d_transpose(net, 8, 3)
 
-        net = conv2d_transpose(net, 8, 3, stride=2)
-        net = conv2d(net, 8, 3)
+        net = conv2d_transpose(net, 4, 3, stride=2)
+        net = conv2d_transpose(net, 2, 3)
         # net = slim.conv2d(net, num_classes, 1, activation_fn=nn.softmax)
         net = slim.conv2d(net, num_classes, 1, activation_fn=nn.sigmoid)
 
