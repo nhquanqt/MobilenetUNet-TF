@@ -19,6 +19,10 @@ def conv2d_transpose(inputs, num_outputs, kernel_size, stride=1, padding='SAME',
     net = activation_fn(net)
     return net
 
+def upsample(inputs, size):
+    shape = inputs.get_shape().as_list()
+    return tf.image.resize_images(inputs, [shape[1] * size, shape[2] * size])
+
 def build_mobilenet_v2_unet(inputs, num_classes):
     logits, end_points = mobilenet_v2.mobilenet_base(inputs)
     with tf.variable_scope('UNet') as scope:
@@ -68,7 +72,8 @@ def build_mobilenet_v2_unet(inputs, num_classes):
 
         net = conv2d_transpose(net, 8, 3, stride=2)
         net = conv2d(net, 8, 3)
-        net = slim.conv2d(net, num_classes, 1, activation_fn=nn.softmax)
+        # net = slim.conv2d(net, num_classes, 1, activation_fn=nn.softmax)
+        net = slim.conv2d(net, num_classes, 1, activation_fn=nn.sigmoid)
 
     return net
     

@@ -47,7 +47,7 @@ print('Loading the data ...')
 
 train_input_names = []
 train_output_names = []
-with open('tusimple/data/train.txt') as f:
+with open('/content/data/train.txt') as f:
     for line in f:
         train_input_names.append(line.split(' ')[0])
         train_output_names.append(line.split(' ')[1])
@@ -72,8 +72,8 @@ for epoch in range(num_epochs):
         for j in range(batch_size):
             index = i*batch_size + j
             id = id_list[index]
-            input_image = cv2.imread(train_input_names[id])
-            output_image = cv2.imread(train_output_names[id], cv2.IMREAD_GRAYSCALE)
+            input_image = cv2.imread(train_input_names[id]) / 255.
+            output_image = cv2.imread(train_output_names[id], cv2.IMREAD_GRAYSCALE) / 255.
             output_image = np.expand_dims(output_image, -1)
 
             input_image_batch.append(input_image)
