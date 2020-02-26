@@ -9,41 +9,23 @@ from model import unet
 
 net_input = tf.placeholder(tf.float32, shape=(None, 224, 224, 3))
 
-network = unet.build_mobilenet_v2_unet(net_input, 2)
-
-variables_to_restore = {v.name.split(":")[0]: v
-                        for v in tf.get_collection(
-                            tf.GraphKeys.GLOBAL_VARIABLES)}
-
-variables_to_restore = {
-    v: variables_to_restore[v] for
-    v in variables_to_restore if v.find('MobilenetV2') != -1}
-
-# print("*** Restore variables ***")
-# for var in variables_to_restore:
-#     print(var)
+network = unet.build_mobilenet_v2_unet(net_input, 1)
 
 sess = tf.Session()
 sess.run(tf.compat.v1.global_variables_initializer())
 
-# saver = tf.train.Saver(var_list=variables_to_restore)
-# saver.restore(sess, 'mobilenet_v2_1.0_224/mobilenet_v2_1.0_224.ckpt')
+saver = tf.train.Saver()
+model_checkpoint_name = 'checkpoints/model.ckpt'
 
+saver.restore(sess, model_checkpoint_name)
 
-# print("*** Trainable variables ***")
-# for var in tf.trainable_variables():
-#     print(var)
-
-# slim.model_analyzer.analyze_vars(model_vars, print_info=True)
-
-for n in tf.get_default_graph().as_graph_def().node:
-    print(n.name)
-
-# t_now = time.time()
-# for _ in range(100):
-#     input_image = np.random.rand(1,224,224,3)
-#     output_image = sess.run(network, feed_dict={net_input:input_image})
-#     print(output_image.shape ,1./(time.time() - t_now))
-#     t_now = time.time()
+for i in range(3137):
+    img = cv2.imread('/home/wan/data/frame_3/{}.jpg'.format(i))
+    cv2.imshow("Camera", img)
+    input_image = np.expand_dims(cv2.resize(img, (224,224)), 0) / 255.
+    output_image = sess.run(network, feed_dict={net_input: input_image})
+    seg = cv2.resize(output_image[0], (640, 480))
+    cv2.imshow("Seg", seg)
+    cv2.waitKey(1)
 
 sess.close()

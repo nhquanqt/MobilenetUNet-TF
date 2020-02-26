@@ -1,3 +1,4 @@
 mobilenet_v2_1.0_224/
 tusimple/
 *.pyc
+*.ckpt.*
