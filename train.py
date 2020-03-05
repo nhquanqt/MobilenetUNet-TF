@@ -7,7 +7,7 @@ import random
 
 from model import unet
 
-num_classes = 1
+num_classes = 2
 num_epochs = 20
 batch_size = 1
 is_continue_training = False
