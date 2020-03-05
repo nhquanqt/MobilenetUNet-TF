@@ -50,12 +50,28 @@ print('Loading the data ...')
 train_inputs = []
 train_outputs = []
 with open('/content/data/train.txt') as f:
+    cnt = 0
     for line in f:
         # train_input_names.append(line.split(' ')[0])
         # train_output_names.append(line.split(' ')[1])
         train_inputs.append(cv2.imread(line.split(' ')[0]))
-        train_outputs.append(np.expand_dims(cv2.imread(line.split(' ')[1], cv2.IMREAD_GRAYSCALE), -1))
-
+        gt = np.expand_dims(cv2.imread(line.split(' ')[1], cv2.IMREAD_GRAYSCALE), -1)
+        gt = np.concatenate((gt,np.zeros(shape=(224,224,1))), axis=-1)
+        try:
+            json_file = line.split(' ')[0].split('.')[0] + '.json'
+            with open(json_file) as f:
+                meta = json.load(f)
+                for shape in meta['shapes']:
+                    p1 = shape['points'][0]
+                    for i in range(1,len(shape['points'])):
+                        p2 = shape['points'][i]
+                        gt = cv2.line(gt, (int(p1[0]),int(p1[1])), (int(p2[0]),int(p2[1])), (0,255), 2)
+                        p1 = p2
+            cnt += 1
+        except:
+            pass
+        train_outputs.append(gt)
+    print('Number of images with dash lines:', cnt)
 
 # Start the training here
 for epoch in range(num_epochs):
