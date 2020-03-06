@@ -51,7 +51,6 @@ print('Loading the data ...')
 train_inputs = []
 train_outputs = []
 with open('/content/data/train.txt') as f:
-    cnt = 0
     for line in f:
         # train_input_names.append(line.split(' ')[0])
         # train_output_names.append(line.split(' ')[1])
@@ -59,13 +58,12 @@ with open('/content/data/train.txt') as f:
         gt_img = cv2.imread(line.split(' ')[1])
 
         gt_img = np.transpose(gt_img, [2,0,1])
-        gt = np.zeros(shape(2,224,224))
+        gt = np.zeros(shape=(2,224,224))
         gt[0] = gt_img[0]
         gt[1] = gt_img[1]
         gt = np.transpose(gt, [1,2,0])
 
         train_outputs.append(gt)
-    print('Number of images with dash lines:', cnt)
 
 # Start the training here
 for epoch in range(num_epochs):
