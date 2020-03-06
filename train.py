@@ -54,7 +54,7 @@ with open('/content/data/train.txt') as f:
     for line in f:
         # train_input_names.append(line.split(' ')[0])
         # train_output_names.append(line.split(' ')[1])
-        train_inputs.append(cv2.imread(line.split(' ')[0]))
+        img = cv2.imread(line.split(' ')[0])
         gt_img = cv2.imread(line.split(' ')[1])
 
         gt_img = np.transpose(gt_img, [2,0,1])
@@ -63,6 +63,13 @@ with open('/content/data/train.txt') as f:
         gt[1] = gt_img[1]
         gt = np.transpose(gt, [1,2,0])
 
+        train_inputs.append(img)
+        train_outputs.append(gt)
+
+        img = cv2.flip(img, 1)
+        gt = cv2.flip(gt, 1)
+
+        train_inputs.append(img)
         train_outputs.append(gt)
 
 # Start the training here
