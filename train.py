@@ -4,11 +4,12 @@ import tensorflow as tf
 import cv2
 import numpy as np
 import random
+import json
 
 from model import unet
 
 num_classes = 2
-num_epochs = 20
+num_epochs = 100
 batch_size = 1
 is_continue_training = False
 
@@ -55,21 +56,14 @@ with open('/content/data/train.txt') as f:
         # train_input_names.append(line.split(' ')[0])
         # train_output_names.append(line.split(' ')[1])
         train_inputs.append(cv2.imread(line.split(' ')[0]))
-        gt = np.expand_dims(cv2.imread(line.split(' ')[1], cv2.IMREAD_GRAYSCALE), -1)
-        gt = np.concatenate((gt,np.zeros(shape=(224,224,1))), axis=-1)
-        try:
-            json_file = line.split(' ')[0].split('.')[0] + '.json'
-            with open(json_file) as f:
-                meta = json.load(f)
-                for shape in meta['shapes']:
-                    p1 = shape['points'][0]
-                    for i in range(1,len(shape['points'])):
-                        p2 = shape['points'][i]
-                        gt = cv2.line(gt, (int(p1[0]),int(p1[1])), (int(p2[0]),int(p2[1])), (0,255), 2)
-                        p1 = p2
-            cnt += 1
-        except:
-            pass
+        gt_img = cv2.imread(line.split(' ')[1])
+
+        gt_img = np.transpose(gt_img, [2,0,1])
+        gt = np.zeros(shape(2,224,224))
+        gt[0] = gt_img[0]
+        gt[1] = gt_img[1]
+        gt = np.transpose(gt, [1,2,0])
+
         train_outputs.append(gt)
     print('Number of images with dash lines:', cnt)
 
