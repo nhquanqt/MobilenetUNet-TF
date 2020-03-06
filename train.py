@@ -66,8 +66,8 @@ with open('/content/data/train.txt') as f:
         train_inputs.append(img)
         train_outputs.append(gt)
 
-        img = cv2.flip(img, 1)
-        gt = cv2.flip(gt, 1)
+        img = np.fliplr(img)
+        gt = np.fliplr(gt)
 
         train_inputs.append(img)
         train_outputs.append(gt)
